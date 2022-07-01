@@ -1,20 +1,13 @@
 require 'test_helper'
 
-class BudaApiTest < ActiveSupport::TestCase
+class BudaApiTest < ActionDispatch::IntegrationTest #ActiveSupport::TestCase
 
   def setup
-    @markets = BudaApi.markets
-    @single_market_spread = BudaApi.single_spread_calculator('btc-clp')
+    # base methods wich the api interacts with
+    @single_market_spread = RawData.api_market_spread
     @single_market_spread_value = @single_market_spread["ticker"]["current_spread"].to_f
-    @every_market_spread = BudaApi.every_market_spread
-  end
-  
-  test "markets should be valid" do
-    assert @markets != nil
-  end
-
-  test "market response should have 24 markets" do
-    assert_equal @markets["markets"].count, 24
+    @every_market_spread = RawData.api_market_spreads
+    @polling_alert_spread = RawData.api_alert_spread
   end
 
   test "single_market_spread object should be valid" do 
@@ -39,4 +32,27 @@ class BudaApiTest < ActiveSupport::TestCase
     assert_operator @every_market_spread.sample["ticker"]["current_spread"].to_f, :>=, 0.0
   end
 
+  test "api should return every market spread in one api call" do
+    assert_equal @every_market_spread.count, 24 
+  end
+
+  test "api should return given_market spread" do 
+    assert @single_market_spread["ticker"]["current_spread"] != nil
+  end
+
+  test "api should return in a given moment in the future the future spread and the beginning alert spread with time" do 
+    assert @polling_alert_spread["ticker"]["alert_spread"][0] != nil
+    assert @polling_alert_spread["ticker"]["alert_spread"][1] != nil
+    assert @polling_alert_spread["ticker"]["current_spread_variation"][1] != nil
+    assert @polling_alert_spread["ticker"]["current_spread_variation"][2] != nil
+  end
+
+  test "api polling time should be later than alert spread" do 
+    time_of_setting_alert_spread = @polling_alert_spread["ticker"]["alert_spread"][1].to_time
+    setted_polling_time = @polling_alert_spread["ticker"]["current_spread_variation"][2].to_time
+    difference = setted_polling_time - time_of_setting_alert_spread
+    assert_operator difference, :>, 0.0
+  end
+
 end
+
