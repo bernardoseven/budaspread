@@ -1,5 +1,10 @@
 # Spread Api
 
+* You can try all the api calls bellow at this link: https://buda-spread.herokuapp.com/ 
+* Just make sure to open the link first, because is a free dyno on heroku, and if it is not being used, it'll be asleep.
+* In the file app/models/concerns/api_call.rb there are methods built to call the api locally successfully, you can use that as a guide to call the api on heroku with little modification.
+
+
 ## Todas las Llamadas son Públicas
 
 ### Markets Spread

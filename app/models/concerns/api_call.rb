@@ -44,8 +44,9 @@ class ApiCall
 					  						quantity,
 					  						given_market,
 					  						amount)
-    url = URI("http://localhost:3000/api/v1/alert_spread") 
 
+    url = URI("http://localhost:3000/api/v1/alert_spread") 
+   
     https = Net::HTTP.new(url.host, url.port);
 	
     request = Net::HTTP::Post.new(url)
